@@ -47,3 +47,5 @@ export type SameName = {
   region: any[];
   selected_region: string;
 };
+
+export type ErrorMetadata = {}
