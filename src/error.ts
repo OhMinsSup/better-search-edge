@@ -1,94 +1,150 @@
-import { ErrorMetadata } from "./search.types";
+import { HTTPException } from "hono/http-exception";
+import { ErrorMetadata } from "./types";
 
 const errors: Record<string, ErrorMetadata> = {
   "-1": {
     code: "-1",
+    statusCode: 400,
     message: "서버 내부에서 처리 중에 에러가 발생한 경우",
     resolution: "재시도",
   },
   "-2": {
     code: "-2",
-    message: "승인되지 않은 KEY 입니다.",
-    resolution: "정확한 승인키를 입력하세요.(팝업API 승인키 사용불가)",
+    statusCode: 400,
+    message:
+      "필수 인자가 포함되지 않은 경우나 호출 인자값의 데이타 타입이 적절하지 않거나 허용된 범위를 벗어난 경우",
+    resolution: "요청 파라미터 확인",
   },
   "-3": {
     code: "-3",
-    message: "검색어가 입력되지 않았습니다.",
-    resolution: "도로명주소 도움센터로 문의하시기 바랍니다.",
+    statusCode: 403,
+    message:
+      "해당 API를 사용하기 위해 필요한 기능(간편가입, 동의항목, 서비스 설정 등)이 활성화 되지 않은 경우",
+    resolution:
+      "[내 애플리케이션]에서 필요한 기능을 선택한 후, [활성화 설정]에서 ON으로 설정한 후 재호출",
   },
   "-4": {
     code: "-4",
-    message: "주소를 상세히 입력해주시기 바랍니다.",
-    resolution: "시도명으로는 검색이 불가합니다.",
+    statusCode: 403,
+    message: "계정이 제재된 경우나 해당 계정에 제재된 행동을 하는 경우",
+    resolution: "",
   },
   "-5": {
     code: "-5",
-    message: "검색어는 두 글자 이상 입력되어야 합니다.",
-    resolution: "한 글자만으로는 검색이 불가합니다.",
-  },
-  "-6": {
-    code: "-6",
-    message: "검색어는 문자와 숫자 같이 입력되어야 합니다.",
-    resolution: "숫자만으로는 검색이 불가합니다.",
+    statusCode: 403,
+    message: "해당 API에 대한 요청 권한이 없는 경우",
+    resolution:
+      "해당 API의 이해하기 문서를 참고하여 검수 진행, 권한 획득 후 재호출",
   },
   "-7": {
     code: "-7",
-    message: "검색어가 너무 깁니다. (한글 40자, 영문, 숫자 80자 이하)",
-    resolution: "80글자를 초과한 검색어는 검색이 불가합니다.",
+    statusCode: 400,
+    message: "서비스 점검 또는 내부 문제가 있는 경우",
+    resolution: "해당 서비스 공지사항 확인",
   },
   "-8": {
     code: "-8",
-    message: "검색어에 너무 긴 숫자가 포함되어 있습니다. (숫자 10자 이하)",
-    resolution: "10자리를 초과하는 숫자가 포함된 검색어는 검색이 불가합니다.",
+    statusCode: 400,
+    message: "올바르지 않은 헤더로 요청한 경우",
+    resolution: "요청 헤더 확인",
   },
   "-9": {
     code: "-9",
-    message: "특수문자+숫자만으로는 검색이 불가능 합니다.",
-    resolution: "특수문자와 숫자만으로 이루어진 검색어는 검색이 불가합니다.",
+    statusCode: 400,
+    message: "서비스가 종료된 API를 호출한 경우",
+    resolution: "공지 메일이나 데브톡 공지확인",
   },
   "-10": {
     code: "-10",
-    message: "SQL 예약어 또는 특수문자( %,=,>,<,[,] )는 검색이 불가능 합니다.",
-    resolution: "SQL 예약어 또는 특수문자를 제거 후 검색합니다.",
+    statusCode: 400,
+    message: "허용된 요청 회수를 초과한 경우",
+    resolution:
+      "쿼터 확인 후 쿼터 범위 내로 호출 조정, 필요시 데브톡으로 제휴 문의",
   },
   "-401": {
     code: "-401",
-    message: "개발승인키 기간이 만료되어 서비스를 이용하실 수 없습니다.",
-    resolution: "개발승인키를 다시 발급받아 API 서비스를 호출합니다.",
+    statusCode: 401,
+    message:
+      "유효하지 않은 앱키나 액세스 토큰으로 요청한 경우, 등록된 앱 정보와 호출된 앱 정보가 불일치 하는 경우",
+    resolution: "앱키 확인 또는 토큰 갱신, 개발자 사이트에 등록된 앱 정보 확인",
   },
   "-501": {
     code: "-501",
-    message: "검색 범위를 초과하였습니다.",
-    resolution: "검색결과가 9천건이 초과하는 검색은 불가합니다.",
+    statusCode: 400,
+    message:
+      "카카오톡 미가입 또는 유예 사용자가 카카오톡 또는 톡캘린더 API를 호출한 경우",
+    resolution: "",
   },
   "-602": {
     code: "-602",
-    message: "검색 범위를 초과하였습니다.",
-    resolution: "검색결과가 9천건이 초과하는 검색은 불가합니다.",
+    statusCode: 400,
+    message: "이미지 업로드 시 최대 용량을 초과한 경우",
+    resolution: "",
   },
   "-603": {
     code: "-603",
-    message: "검색 범위를 초과하였습니다.",
-    resolution: "검색결과가 9천건이 초과하는 검색은 불가합니다.",
+    statusCode: 400,
+    message: "카카오 플랫폼 내부에서 요청 처리 중 타임아웃이 발생한 경우",
+    resolution: "",
   },
   "-606": {
     code: "-606",
-    message: "검색 범위를 초과하였습니다.",
-    resolution: "검색결과가 9천건이 초과하는 검색은 불가합니다.",
+    statusCode: 400,
+    message: "업로드할 수 있는 최대 이미지 개수를 초과한 경우",
+    resolution: "",
   },
   "-903": {
     code: "-903",
-    message: "검색 범위를 초과하였습니다.",
-    resolution: "검색결과가 9천건이 초과하는 검색은 불가합니다.",
+    statusCode: 400,
+    message:
+      "등록되지 않은 개발자의 앱키나 등록되지 않은 개발자의 앱키로 구성된 액세스 토큰으로 요청한 경우",
+    resolution: "",
   },
   "-911": {
     code: "-911",
-    message: "검색 범위를 초과하였습니다.",
-    resolution: "검색결과가 9천건이 초과하는 검색은 불가합니다.",
+    statusCode: 400,
+    message: "지원하지 않는 포맷의 이미지를 업로드 하는 경우",
+    resolution: "",
   },
   "-9798": {
     code: "-9798",
+    statusCode: 503,
     message: "서비스 점검중	",
     resolution: "",
   },
+  "-10000": {
+    code: "-10000",
+    statusCode: 401,
+    message: "인증되지 않은 앱키로 요청한 경우",
+    resolution: "앱키 확인",
+  },
+  "-10001": {
+    code: "-10001",
+    statusCode: 400,
+    message: "입력 파라미터 오류",
+    resolution: "요청 파라미터 확인",
+  },
+};
+
+type HTTPExceptionOptions = {
+  res?: Response;
+  message?: string;
+};
+
+export const KakaoKeyError = (options?: Omit<HTTPExceptionOptions, "res">) => {
+  console.log(errors["-10000"].message);
+  const res = new Response(JSON.stringify(errors["-10000"].message), {
+    status: errors["-10000"].statusCode,
+  });
+  return new HTTPException(res.status, { ...options, res });
+};
+
+export const InvalidArgumentsError = (
+  options?: Omit<HTTPExceptionOptions, "res">
+) => {
+  console.log(errors["-10001"].message);
+  const res = new Response(JSON.stringify(errors["-10001"].message), {
+    status: errors["-10001"].statusCode,
+  });
+  return new HTTPException(res.status, { ...options, res });
 };

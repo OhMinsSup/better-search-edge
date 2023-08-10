@@ -1,10 +1,8 @@
 import hash from "stable-hash";
+import { HTTPException } from "hono/http-exception";
 import { CATEGORY_GROUP_CODE, MAX_SIZE, UPSTREAM_TIMEOUT } from "./constants";
-import type {
-  MakeSearchParams,
-  SearchParams,
-  SearchResult,
-} from "./search.types";
+import type { MakeSearchParams, SearchParams, SearchResult } from "./types";
+import { InvalidArgumentsError } from "./error";
 
 export const makeSearch = ({
   namespace,
@@ -22,19 +20,27 @@ export const makeSearch = ({
     console.debug("page", page);
 
     if (!keyword) {
-      throw new Error("keyword is required");
+      throw InvalidArgumentsError({
+        message: "keyword is required",
+      });
     }
 
     if (/[\%\=\>\<\[\]]/.test(keyword)) {
-      throw new Error("keyword must not contain special characters");
+      throw InvalidArgumentsError({
+        message: "keyword must not contain special characters",
+      });
     }
 
     if (category && !CATEGORY_GROUP_CODE.includes(category)) {
-      throw new Error("category must be one of CATEGORY_GROUP_CODE");
+      throw InvalidArgumentsError({
+        message: "category must be one of CATEGORY_GROUP_CODE",
+      });
     }
 
     if (sort && !["accuracy", "distance"].includes(sort)) {
-      throw new Error("sort must be one of 'accuracy' or 'distance'");
+      throw InvalidArgumentsError({
+        message: "sort must be one of 'accuracy' or 'distance'",
+      });
     }
 
     const queryKeys = [keyword] as string[];
@@ -90,9 +96,11 @@ export const makeSearch = ({
         });
 
         if (!response.ok) {
-          throw new Error(
-            `Unexpected error response from upstream, status: ${response.status}, text: ${response.statusText}`
-          );
+          console.error("API response is not ok");
+          return new HTTPException(response.status, {
+            res: response,
+            message: response.statusText,
+          });
         }
 
         const body = (await response.json()) as SearchResult;

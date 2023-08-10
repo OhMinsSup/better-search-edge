@@ -6,10 +6,6 @@
   "dependencies": {
     "@hono/zod-validator": "^0.1.5",
     "hono": "^3.4.1",
-    "modern-errors": "^6.0.0",
-    "modern-errors-http": "^4.0.0",
-    "modern-errors-serialize": "^5.0.0",
-    "modern-errors-switch": "^3.0.0",
     "stable-hash": "^0.0.3",
     "zod": "^3.21.4"
   },

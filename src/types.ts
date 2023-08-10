@@ -48,4 +48,9 @@ export type SameName = {
   selected_region: string;
 };
 
-export type ErrorMetadata = {}
+export type ErrorMetadata = {
+  code: string;
+  statusCode: number;
+  message: string;
+  resolution: string;
+};
