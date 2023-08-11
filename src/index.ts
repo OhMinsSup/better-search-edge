@@ -11,6 +11,7 @@ import type { Document } from "./types";
 
 type BindingsType = {
   INDEX: KVNamespace;
+  ENVIRONMENT: "development" | "production";
   KAKAO_REST_API_KEY: string;
 };
 
@@ -22,7 +23,24 @@ const app = new Hono<Env>();
 
 app.use("*", logger());
 
-app.use("/api/v1/*", cors());
+app.use("/api/v1/*", (c, next) =>
+  cors({
+    origin: (origin) => {
+      if (!origin) {
+        return null;
+      }
+      const allowedHosts = [];
+      if (c.env.ENVIRONMENT === "development") {
+        allowedHosts.push(/^http:\/\/localhost/);
+      }
+      const valid = allowedHosts.some((regex) => regex.test(origin));
+      if (valid) {
+        return origin;
+      }
+      return null;
+    },
+  })(c, next)
+);
 
 app.get(
   "/api/v1/local/search/:keyword",
