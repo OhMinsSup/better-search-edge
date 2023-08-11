@@ -64,7 +64,6 @@ export const makeSearch = ({
         console.log("Ignore cache");
       }
 
-      console.log("result", result);
       if (!result) {
         const url = new URL(
           "https://dapi.kakao.com/v2/local/search/keyword.json"
@@ -96,14 +95,13 @@ export const makeSearch = ({
         });
 
         if (!response.ok) {
-          console.error("API response is not ok");
           return new HTTPException(response.status, {
             res: response,
             message: response.statusText,
           });
         }
 
-        const body = (await response.json()) as SearchResult;
+        const body = await response.json<SearchResult>();
 
         await namespace.put(cacheKey, JSON.stringify(body), {
           expirationTtl: 60 * 60 * 24 * 30,

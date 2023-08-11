@@ -5,6 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { makeSearch } from "./search";
 import { schemaQuery } from "./schema";
 import { validateKakoKey } from "./middleware";
+import { HTTPException } from "hono/http-exception";
 
 import type { Document } from "./types";
 
@@ -45,7 +46,7 @@ app.get(
     try {
       const items: Document[] = [];
       const offset = (page - 1) * size;
-      const queryKeyword = keyword.replaceAll(" ", "");
+      const queryKeyword = keyword.trim();
 
       for await (const item of search({ keyword: queryKeyword, offset })) {
         items.push(item);
@@ -55,12 +56,34 @@ app.get(
       }
 
       return c.json({
-        page,
-        hasNext: items.length > size,
-        items: items.slice(0, size),
+        oK: true,
+        result: {
+          page,
+          hasNext: items.length > size,
+          items: items.slice(0, size),
+        },
+        error: null,
       });
     } catch (error) {
-      return c.json(error, 500);
+      if (error instanceof HTTPException) {
+        const response = error.getResponse();
+        return c.json(
+          {
+            ok: false,
+            result: null,
+            error: await response.json(),
+          },
+          response.status
+        );
+      }
+      return c.json(
+        {
+          ok: false,
+          result: null,
+          error: null,
+        },
+        500
+      );
     }
   }
 );
