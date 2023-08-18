@@ -132,8 +132,7 @@ type HTTPExceptionOptions = {
 };
 
 export const KakaoKeyError = (options?: Omit<HTTPExceptionOptions, "res">) => {
-  console.log(errors["-10000"].message);
-  const res = new Response(JSON.stringify(errors["-10000"].message), {
+  const res = new Response(JSON.stringify(errors["-10000"]), {
     status: errors["-10000"].statusCode,
   });
   return new HTTPException(res.status, { ...options, res });
@@ -142,8 +141,7 @@ export const KakaoKeyError = (options?: Omit<HTTPExceptionOptions, "res">) => {
 export const InvalidArgumentsError = (
   options?: Omit<HTTPExceptionOptions, "res">
 ) => {
-  console.log(errors["-10001"].message);
-  const res = new Response(JSON.stringify(errors["-10001"].message), {
+  const res = new Response(JSON.stringify(errors["-10001"]), {
     status: errors["-10001"].statusCode,
   });
   return new HTTPException(res.status, { ...options, res });

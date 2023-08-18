@@ -117,7 +117,6 @@ export const makeSearch = ({
       for (const document of documents) {
         iterCount += 1;
         yield document;
-        console.debug(`location %i %o`, iterCount, document);
       }
 
       const totalCount = +result.meta.total_count;
