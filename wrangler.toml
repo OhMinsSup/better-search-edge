@@ -1,7 +1,7 @@
 name = "better-search-edge"
 compatibility_date = "2023-01-01"
 
-vars = { KAKAO_REST_API_KEY = "", ENVIRONMENT = "development" }
+vars = { KAKAO_REST_API_KEY = "951228dd3aa973eaeed205eed7b6ade6", ENVIRONMENT = "development" }
 
 kv_namespaces = [
     { binding = "INDEX", id = "f82b1bfd7429462ba95f0ed73ebe63e8", preview_id = "4cd3bd2a84ac4e8793d708be7732993c" }
